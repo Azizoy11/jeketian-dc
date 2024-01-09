@@ -13,8 +13,12 @@ import (
 )
 
 func main() {
-	liveRepository := repository.NewLiveRepository()
-	liveService := service.NewLiveService(liveRepository)
+	srLiveRepository := repository.NewSRLiveRepository()
+	srLiveService := service.NewSRLiveService(srLiveRepository)
+
+	idnLiveRepository := repository.NewIDNLiveRepository()
+	idnLiveService := service.NewIDNLiveService(idnLiveRepository)
+
 	ctx := context.Background()
 
 	log.Println("Running...")
@@ -22,11 +26,10 @@ func main() {
 	var onLives model.OnLives
 
 	for {
-		lives, _ := liveService.FindAll(ctx)
-		for _, live := range lives {
-			live := live
-			go func() {
-				IsRecording := liveService.IsRecording(ctx, &onLives, live.MemberUsername)
+		srLives, _ := srLiveService.FindAllSR(ctx)
+		go func() {
+			for _, live := range srLives {
+				IsRecording := srLiveService.IsRecordingSR(ctx, &onLives, live.MemberUsername)
 				if !IsRecording {
 					os.Mkdir(fmt.Sprintf("download/%s", live.MemberUsername), os.ModePerm)
 					DL := hlsdl.NewRecorder(live.StreamUrl, fmt.Sprintf("download/%s", live.MemberUsername))
@@ -36,8 +39,26 @@ func main() {
 					}
 					log.Println(fmt.Sprintf("%s | %s", live.MemberUsername, filepath))
 				}
-			}()
-		}
-		time.Sleep(10 * time.Second)
+				time.Sleep(10 * time.Second)
+			}
+		}()
+
+		idnLives, _ := idnLiveService.FindAllIDN(ctx)
+		go func() {
+			for _, live := range idnLives {
+				log.Println(live)
+				IsRecording := idnLiveService.IsRecordingIDN(ctx, &onLives, live.MemberUsername)
+				if !IsRecording {
+					os.Mkdir(fmt.Sprintf("download/%s", live.MemberUsername), os.ModePerm)
+					DL := hlsdl.NewRecorder(live.StreamUrl, fmt.Sprintf("download/%s", live.MemberUsername))
+					filepath, err := DL.Start()
+					if err != nil {
+						log.Println(err)
+					}
+					log.Println(fmt.Sprintf("%s | %s", live.MemberUsername, filepath))
+				}
+				time.Sleep(10 * time.Second)
+			}
+		}()
 	}
 }
