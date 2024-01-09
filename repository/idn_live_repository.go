@@ -59,6 +59,10 @@ func (repository *IDNLiveRepositoryImpl) FindAllIDN(ctx context.Context) ([]mode
 				}
 				playbackUrl := xurl.FindAllString(string(body), -1)
 
+				if len(playbackUrl) < 2 {
+					log.Println(playbackUrl)
+				}
+
 				startedAt, _ := time.Parse("2024-01-09T06:27:22+07:00", data.LiveAt)
 				live := model.Live{
 					MemberUsername:    data.Creator.Username,

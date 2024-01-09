@@ -45,13 +45,12 @@ func main() {
 				if !IsRecording {
 					os.Mkdir("download/sr", os.ModePerm)
 					DL := hlsdl.NewRecorder(live.StreamUrl, "download/sr")
-					filepath, err := DL.Start(fmt.Sprintf("%s.mp4", live.MemberUsername))
+					filepath, err := DL.Start(fmt.Sprintf("%s_%d.mp4", live.MemberUsername, time.Now().Unix()))
 					if err != nil {
 						log.Fatal(err)
 					}
 					log.Println(fmt.Sprintf("%s | %s", live.MemberUsername, filepath))
 				}
-				time.Sleep(10 * time.Second)
 			}()
 		}
 
@@ -65,14 +64,14 @@ func main() {
 					log.Println("[Start Recording]", live.MemberUsername)
 					os.Mkdir("download/idn", os.ModePerm)
 					DL := hlsdl.NewRecorder(live.StreamUrl, "download/idn")
-					filepath, err := DL.Start(fmt.Sprintf("%s.mp4", live.MemberUsername))
+					filepath, err := DL.Start(fmt.Sprintf("%s_%d.mp4", live.MemberUsername, time.Now().Unix()))
 					if err != nil {
 						log.Println(err)
 					}
 					log.Println(fmt.Sprintf("%s | %s", live.MemberUsername, filepath))
 				}
-				time.Sleep(10 * time.Second)
 			}()
 		}
+		time.Sleep(10 * time.Second)
 	}
 }

@@ -29,10 +29,16 @@ func SendDiscordNotification(live model.Live) {
 		log.Fatal(err)
 	}
 
-	webhooksJson, _ := io.ReadAll(jsonFile)
+	webhooksJson, err := io.ReadAll(jsonFile)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	var webhooks []Webhook
-	json.Unmarshal(webhooksJson, &webhooks)
+	err = json.Unmarshal(webhooksJson, &webhooks)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	var liveUrl string
 	if live.Platform == "IDN" {
