@@ -9,6 +9,7 @@ import (
 	"jkt48lab/helper"
 	"jkt48lab/model"
 	"log"
+	"mvdan.cc/xurls/v2"
 	"strings"
 	"time"
 )
@@ -48,13 +49,23 @@ func (repository *IDNLiveRepositoryImpl) FindAllIDN(ctx context.Context) ([]mode
 					continue
 				}
 
+				xurl := xurls.Relaxed()
+
+				resp, _ := helper.Fetch(data.PlaybackUrl)
+				defer resp.Body.Close()
+				body, err := io.ReadAll(resp.Body)
+				if err != nil {
+					log.Println(err)
+				}
+				playbackUrl := xurl.FindAllString(string(body), -1)
+
 				startedAt, _ := time.Parse("2024-01-09T06:27:22+07:00", data.LiveAt)
 				live := model.Live{
 					MemberUsername:    data.Creator.Username,
 					MemberDisplayName: data.Creator.Name,
 					Platform:          "IDN",
 					Title:             data.Title,
-					StreamUrl:         data.PlaybackUrl,
+					StreamUrl:         playbackUrl[1],
 					Views:             uint(data.ViewCount),
 					StartedAt:         uint(startedAt.Unix()),
 				}

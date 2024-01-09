@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/canhlinh/hlsdl"
+	"jkt48lab/hlsdl"
 	"jkt48lab/model"
 	"jkt48lab/repository"
 	"jkt48lab/service"
@@ -29,11 +29,12 @@ func main() {
 		srLives, _ := srLiveService.FindAllSR(ctx)
 		go func() {
 			for _, live := range srLives {
+				log.Println("[Start Recording]", live.MemberUsername)
 				IsRecording := srLiveService.IsRecordingSR(ctx, &onLives, live.MemberUsername)
 				if !IsRecording {
-					os.Mkdir(fmt.Sprintf("download/%s", live.MemberUsername), os.ModePerm)
-					DL := hlsdl.NewRecorder(live.StreamUrl, fmt.Sprintf("download/%s", live.MemberUsername))
-					filepath, err := DL.Start()
+					os.Mkdir("download/sr", os.ModePerm)
+					DL := hlsdl.NewRecorder(live.StreamUrl, "download/sr")
+					filepath, err := DL.Start(fmt.Sprintf("%s.mp4", live.MemberUsername))
 					if err != nil {
 						log.Fatal(err)
 					}
@@ -46,12 +47,12 @@ func main() {
 		idnLives, _ := idnLiveService.FindAllIDN(ctx)
 		go func() {
 			for _, live := range idnLives {
-				log.Println(live)
 				IsRecording := idnLiveService.IsRecordingIDN(ctx, &onLives, live.MemberUsername)
 				if !IsRecording {
-					os.Mkdir(fmt.Sprintf("download/%s", live.MemberUsername), os.ModePerm)
-					DL := hlsdl.NewRecorder(live.StreamUrl, fmt.Sprintf("download/%s", live.MemberUsername))
-					filepath, err := DL.Start()
+					log.Println("[Start Recording]", live.MemberUsername)
+					os.Mkdir("download/idn", os.ModePerm)
+					DL := hlsdl.NewRecorder(live.StreamUrl, "download/idn")
+					filepath, err := DL.Start(fmt.Sprintf("%s.mp4", live.MemberUsername))
 					if err != nil {
 						log.Println(err)
 					}

@@ -9,7 +9,6 @@ import (
 	"jkt48lab/helper"
 	"jkt48lab/model"
 	"log"
-	"net/http"
 	"strings"
 )
 
@@ -49,7 +48,7 @@ func (repository *SRLiveRepositoryImpl) FindAllSR(ctx context.Context) ([]model.
 				continue
 			}
 
-			resp, err := http.Get(fmt.Sprintf("https://www.showroom-live.com/api/live/streaming_url?abr_available=1&room_id=%d", data.RoomId))
+			resp, err := helper.Fetch(fmt.Sprintf("https://www.showroom-live.com/api/live/streaming_url?abr_available=1&room_id=%d", data.RoomId))
 			if err != nil {
 				log.Fatal(err)
 			}
