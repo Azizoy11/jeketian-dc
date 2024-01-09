@@ -67,6 +67,7 @@ func (repository *IDNLiveRepositoryImpl) FindAllIDN(ctx context.Context) ([]mode
 					Title:             data.Title,
 					StreamUrl:         playbackUrl[1],
 					Views:             uint(data.ViewCount),
+					ImageUrl:          data.ImageUrl,
 					StartedAt:         uint(startedAt.Unix()),
 				}
 				lives = append(lives, live)

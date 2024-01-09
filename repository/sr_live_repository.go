@@ -68,6 +68,7 @@ func (repository *SRLiveRepositoryImpl) FindAllSR(ctx context.Context) ([]model.
 					Title:             fmt.Sprintf("%s Live", data.MainName),
 					StreamUrl:         result.StreamingUrlList[1].Url,
 					Views:             data.ViewNum,
+					ImageUrl:          data.Image,
 					StartedAt:         data.StartedAt,
 				}
 				lives = append(lives, live)

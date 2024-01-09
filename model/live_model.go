@@ -7,6 +7,7 @@ type Live struct {
 	Title             string `json:"title,omitempty"`
 	StreamUrl         string `json:"stream_url,omitempty"`
 	Views             uint   `json:"views,omitempty"`
+	ImageUrl          string `json:"image_url"`
 	StartedAt         uint   `json:"started_at"`
 }
 

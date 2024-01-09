@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/canhlinh/hlsdl"
 	"io"
+	"jkt48lab/hlsdl"
 	"jkt48lab/model"
 	"jkt48lab/repository"
 	"jkt48lab/service"
@@ -38,7 +38,7 @@ func TestIDN(t *testing.T) {
 				if !IsRecording {
 					os.Mkdir(fmt.Sprintf("download/%s", live.MemberUsername), os.ModePerm)
 					DL := hlsdl.NewRecorder(live.StreamUrl, fmt.Sprintf("download/%s", live.MemberUsername))
-					filepath, err := DL.Start()
+					filepath, err := DL.Start("")
 					if err != nil {
 						log.Println(err)
 					}
