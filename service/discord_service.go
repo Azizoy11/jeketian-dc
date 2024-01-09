@@ -23,8 +23,11 @@ func SendDiscordNotification(live model.Live) {
 		log.Fatal(err)
 	}
 
-	jsonFile, _ := os.Open("data/notification_webhooks.json")
+	jsonFile, err := os.Open("./data/notification_webhooks.json")
 	defer jsonFile.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	webhooksJson, _ := io.ReadAll(jsonFile)
 

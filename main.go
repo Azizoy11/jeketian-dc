@@ -9,6 +9,7 @@ import (
 	"jkt48lab/service"
 	"log"
 	"os"
+	"os/signal"
 	"time"
 )
 
@@ -24,6 +25,14 @@ func main() {
 	log.Println("Running...")
 
 	var onLives model.OnLives
+
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, os.Interrupt)
+	go func() {
+		<-sigs
+		fmt.Printf("You pressed ctrl + C. User interrupted infinite loop.")
+		os.Exit(0)
+	}()
 
 	for {
 		srLives, _ := srLiveService.FindAllSR(ctx)
