@@ -34,7 +34,7 @@ func TestIDN(t *testing.T) {
 		go func() {
 			for _, live := range idnLives {
 				log.Println(live)
-				IsRecording := idnLiveService.IsRecordingIDN(ctx, &onLives, live.MemberUsername)
+				IsRecording, _ := idnLiveService.IsRecordingIDN(ctx, &onLives, live.MemberUsername)
 				if !IsRecording {
 					os.Mkdir(fmt.Sprintf("download/%s", live.MemberUsername), os.ModePerm)
 					DL := hlsdl.NewRecorder(live.StreamUrl, fmt.Sprintf("download/%s", live.MemberUsername))

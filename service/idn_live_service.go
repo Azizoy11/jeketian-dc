@@ -9,14 +9,14 @@ import (
 type IDNLiveService interface {
 	FindAllIDN(ctx context.Context) ([]model.Live, error)
 	FindIDN(ctx context.Context, username string) (model.Live, error)
-	IsRecordingIDN(ctx context.Context, onLives *model.OnLives, username string) bool
+	IsRecordingIDN(ctx context.Context, onLives *model.OnLives, username string) (bool, bool)
 }
 
 type IDNLiveServiceImpl struct {
 	IDNLiveRepository repository.IDNLiveRepository
 }
 
-func (service *IDNLiveServiceImpl) IsRecordingIDN(ctx context.Context, onLives *model.OnLives, username string) bool {
+func (service *IDNLiveServiceImpl) IsRecordingIDN(ctx context.Context, onLives *model.OnLives, username string) (bool, bool) {
 	return service.IDNLiveRepository.IsRecordingIDN(ctx, onLives, username)
 }
 

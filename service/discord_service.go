@@ -16,13 +16,7 @@ type Webhook struct {
 	Token string `json:"token"`
 }
 
-func SendDiscordNotification(live model.Live) {
-	godotenv.Load()
-	bot, err := discordgo.New(os.Getenv("DISCORD_TOKEN"))
-	if err != nil {
-		log.Fatal(err)
-	}
-
+func GetWebhooks() []Webhook {
 	jsonFile, err := os.Open("./data/notification_webhooks.json")
 	defer jsonFile.Close()
 	if err != nil {
@@ -39,6 +33,19 @@ func SendDiscordNotification(live model.Live) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	return webhooks
+}
+
+func SendDiscordNotification(live model.Live) {
+	godotenv.Load()
+	bot, err := discordgo.New(os.Getenv("DISCORD_TOKEN"))
+	defer bot.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	webhooks := GetWebhooks()
 
 	var liveUrl string
 	if live.Platform == "IDN" {
@@ -90,5 +97,49 @@ func SendDiscordNotification(live model.Live) {
 			log.Fatal(err)
 		}
 	}
+}
 
+func SendDiscordEndNotification(live model.Live) {
+	godotenv.Load()
+	bot, err := discordgo.New(os.Getenv("DISCORD_TOKEN"))
+	defer bot.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	webhooks := GetWebhooks()
+	//TODO: FIX YOUTUBE / OTHER PLATFORM
+	//youtubeVideo := UploadVideoToYoutube(live)
+
+	for _, webhook := range webhooks {
+		embed := &discordgo.MessageEmbed{
+			URL:         "https://jkt48.safatanc.com",
+			Title:       "Notifikasi Live Berakhir",
+			Description: fmt.Sprintf("Live **%s** di `%s` telah berakhir", live.MemberUsername, live.Platform),
+			Color:       0xccec1c,
+			Footer: &discordgo.MessageEmbedFooter{
+				Text: "JKT48Lab by safatanc.com",
+			},
+			Image: nil,
+			Thumbnail: &discordgo.MessageEmbedThumbnail{
+				URL: live.ImageUrl,
+			},
+			Fields: []*discordgo.MessageEmbedField{
+				{
+					Name:   "Tonton Replay",
+					Value:  "Coming soon...",
+					Inline: true,
+				},
+			},
+		}
+		_, err = bot.WebhookExecute(webhook.Id, webhook.Token, false, &discordgo.WebhookParams{
+			Username: "JKT48Lab",
+			Embeds: []*discordgo.MessageEmbed{
+				embed,
+			},
+		})
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 }

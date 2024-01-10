@@ -17,7 +17,7 @@ import (
 type IDNLiveRepository interface {
 	FindAllIDN(ctx context.Context) ([]model.Live, error)
 	FindIDN(ctx context.Context, username string) (model.Live, error)
-	IsRecordingIDN(ctx context.Context, onLives *model.OnLives, username string) bool
+	IsRecordingIDN(ctx context.Context, onLives *model.OnLives, username string) (bool, bool)
 }
 
 type IDNLiveRepositoryImpl struct {
@@ -70,9 +70,9 @@ func (repository *IDNLiveRepositoryImpl) FindAllIDN(ctx context.Context) ([]mode
 					Platform:          "IDN",
 					Title:             data.Title,
 					StreamUrl:         playbackUrl[1],
-					Views:             uint(data.ViewCount),
+					Views:             data.ViewCount,
 					ImageUrl:          data.ImageUrl,
-					StartedAt:         uint(startedAt.Unix()),
+					StartedAt:         int(startedAt.Unix()),
 				}
 				lives = append(lives, live)
 
@@ -97,20 +97,20 @@ func (repository *IDNLiveRepositoryImpl) FindIDN(ctx context.Context, username s
 	return live, errors.New(fmt.Sprintf("%s sedang tidak live"))
 }
 
-func (repository *IDNLiveRepositoryImpl) IsRecordingIDN(ctx context.Context, onLives *model.OnLives, username string) bool {
+func (repository *IDNLiveRepositoryImpl) IsRecordingIDN(ctx context.Context, onLives *model.OnLives, username string) (bool, bool) {
 	_, err := repository.FindIDN(ctx, username)
 	if err != nil {
 		// Member sedang tidak live
 		if helper.Contains(onLives.MemberOnLives, username) {
 			onLives.MemberOnLives = helper.RemoveStringFromSlice(onLives.MemberOnLives, username)
-			return false
+			return false, true
 		}
 	}
 	if !helper.Contains(onLives.MemberOnLives, username) {
 		onLives.MemberOnLives = append(onLives.MemberOnLives, username)
-		return false
+		return false, false
 	} else {
-		return true
+		return true, false
 	}
 }
 

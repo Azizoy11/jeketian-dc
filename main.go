@@ -39,10 +39,10 @@ func main() {
 		for _, live := range srLives {
 			live := live
 			go func() {
-				service.SendDiscordNotification(live)
 				log.Println("[Start Recording]", live.MemberUsername)
 				IsRecording := srLiveService.IsRecordingSR(ctx, &onLives, live.MemberUsername)
 				if !IsRecording {
+					service.SendDiscordNotification(live)
 					os.Mkdir("download/sr", os.ModePerm)
 					DL := hlsdl.NewRecorder(live.StreamUrl, "download/sr")
 					filepath, err := DL.Start(fmt.Sprintf("%s_%d.mp4", live.MemberUsername, time.Now().Unix()))
@@ -58,7 +58,7 @@ func main() {
 		for _, live := range idnLives {
 			live := live
 			go func() {
-				IsRecording := idnLiveService.IsRecordingIDN(ctx, &onLives, live.MemberUsername)
+				IsRecording, isEnd := idnLiveService.IsRecordingIDN(ctx, &onLives, live.MemberUsername)
 				if !IsRecording {
 					service.SendDiscordNotification(live)
 					log.Println("[Start Recording]", live.MemberUsername)
@@ -69,6 +69,9 @@ func main() {
 						log.Println(err)
 					}
 					log.Println(fmt.Sprintf("%s | %s", live.MemberUsername, filepath))
+				}
+				if isEnd {
+					service.SendDiscordEndNotification(live)
 				}
 			}()
 		}
